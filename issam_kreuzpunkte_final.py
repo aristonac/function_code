@@ -10,7 +10,8 @@ from pyparsing import delimited_list
 from utils import *
 
 
-pfad = 'C:/Users/ML/yolov5/runs/detect_cp/pos3_txt/labels/'
+
+pfad = 'C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp_pos123_150_100e_m_v_ml_ti/labels/'
 ordner = os.listdir(pfad)
 
 for filename in ordner: 
@@ -47,13 +48,13 @@ for filename in ordner:
     
     res.append(f"{dfyy}\n")
     
-    table= dfyy.to_string( index=False, col_space=0)
+    table= dfyy.to_string( index=False, col_space=0,header=None, )
     
     table=re.sub("(\r|\n)[\t]+|(\r|\n)[' ']+","\n",table)
-    table2=re.sub("\b[\t]+|[' ']+",",",table)
+    table2=re.sub("\b[\t]+|[' ']+"," ",table) # free row
     
    
-    print(table2)
+    print(table)
     
     all = Path(filename).stem
     f = open(all+".txt","w")

@@ -11,19 +11,19 @@ import numpy as np
 import os
 
 
-img_source = ('C:/Users/ML/yolov5/bilder_sp/III/') #source
+img_source = ('C:/WORK_DATA/bilder_people/train-400/train-400/') #source
 directory_source = os.fsencode(img_source)
-img_des = ('C:/Users/ML/yolov5/bilder_sp/res_III/') #wo du speicherst
+img_des = ('C:/WORK_DATA/bilder_people/annotierte/') #wo du speicherst
 directory_des = os.fsencode(img_des)
 
 for filename in os.listdir(directory_source):
     #print(filename) 
     
-    if filename.endswith(b'.jpg'):
+    if filename.endswith(b'.png'):
         img = cv2.imread(img_source + str(filename, 'utf-8'))
         #print(img) 
         #cv2.imshow('show',img)
-        cropped_image = img[0:3000, 1200:2800]
+        cropped_image = img[10:250,15:350] #y,x
         #cv2.imshow("cropped", cropped_image) 
         cv2.imwrite(img_des + str(filename, 'utf-8'), cropped_image)
         cv2.waitKey(0)

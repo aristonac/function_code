@@ -5,12 +5,11 @@ import os
 import re
 from os.path import join 
 from pathlib import Path
-
 from pyparsing import delimited_list
 from utils import *
 
 
-pfad = 'C:/Users/ML/yolov5/runs/detect_cp/pos3_txt/labels/'
+pfad = 'C:/Users/ML/yolov5/runs/detect_cp/pos3_label/labels/'
 ordner = os.listdir(pfad)
 
 for filename in ordner: 

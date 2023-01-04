@@ -8,9 +8,9 @@ import re
 
 
 
-A1_dir = ('C:/Users/ML/yolov5/bilder_sp') #bilder
+A1_dir = ('C:/WORK_DATA/bilder/') #bilder
 #added A1_dir to have it stored for later.
-dir = ('C:/Users/ML/training_set/cp/cp_sp_1600x3000/val/') #annotation
+dir = ('C:/Users/ML/training_set/iou_diou/cp/cp_150_pos1_nonuniform/val/') #annotation
 
 
 #get the list of files
