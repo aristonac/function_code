@@ -1,8 +1,10 @@
 from multiprocessing.spawn import old_main_modules
 import numpy as np
 import pandas as pd
-
+import cv2 as cv
+import glob
 import os
+import statistics
 import re
 import itertools
 import math
@@ -10,10 +12,11 @@ from itertools import tee, islice, chain, zip_longest, cycle
 # from evaluation_points import Point  
 from os.path import join 
 from pathlib import Path
+import matplotlib.pyplot as plt
 
 from pyparsing import delimited_list
 
-pfad = 'C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp19/labels/'
+pfad = 'C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp23/labels/'
 ordner = os.listdir(pfad)
 
 def selection_sort(x):
@@ -30,11 +33,23 @@ def previous_and_next(some_iterable):
 
 def distance(pt_1, pt_2):
     pt_1 = np.array
-    
+
+
+
+
 for filename in ordner: 
+    # for file in os.listdir(pfad):
+    #  filename = os.fsdecode(file)
+    #  if filename.endswith(".txt") or filename.endswith(".py"): 
+    #      print(os.path.join(pfad, filename))
+    #      continue
+    #  else:
+    #      continue
+    
     res = []    
     
     data = np.loadtxt(pfad + filename, delimiter=' ',dtype=str)
+    # print('this is the filename', filename)
     df  = pd.DataFrame(data)
     df.head()
     df.columns = ['class','x_center','y_center','width','height']
@@ -65,10 +80,22 @@ for filename in ordner:
     zipped_list = list(zipped)  # we take this for sort function
     # zipped_list_array = np.array(zipped_list)
     all_list_array = np.array(all_list)
+    
+    '''This is sort in class'''
+    zipped_sort_c = sorted(zipped_list, key=lambda k: [k[0], k[2]])
+    df_zipped_sort_c = pd.DataFrame(zipped_sort_c)
+    print('this is sorting in c \n', df_zipped_sort_c) # we sorting the class in y, next step we do slcicing to separate the class 
+    
+    '''Separating the class, goal is for make 2 Grids'''
+    dfc0 = df_zipped_sort_c[df_zipped_sort_c['0'] = 0]
+    dfc1 = df_zipped_sort_c[df_zipped_sort_c['1'] = 1]
+    dfc2 = df_zipped_sort_c[df_zipped_sort_c['2'] = 2]
+    print(dfc0)
+    
     '''This is sort in x '''
-    zipped_sort_x = sorted(zipped_list, key=lambda k: [k[1], k[2]])
-    df_zipped_sort_x = pd.DataFrame(zipped_sort_x)
-    # print('this is x \n', df_zipped_sort_x)
+    # zipped_sort_x = sorted(zipped_list, key=lambda k: [k[1], k[2]])
+    # df_zipped_sort_x = pd.DataFrame(zipped_sort_x)
+    # print('this is sorting in x \n', df_zipped_sort_x)
     # arr_zip = np.array(all_list)
     # df_selected = pd.DataFrame(zipped_list)
     
@@ -102,14 +129,45 @@ for filename in ordner:
     
     euk_dist = np.sqrt(r) # only between values next and before
     # dist[np.diag_indices(dist.shape[0])] = 1e10
-    print('this is euk dist \n' , euk_dist)
+    # print('this is euk dist every point to another neighbour \n' , euk_dist)
     # rowmin = np.min(euk_dist,axis=1)
     # print(rowmin)   
     # minval = np.min(euk_dist[np.nonzero(euk_dist)])
     minevery = np.where(euk_dist>0, euk_dist, np.inf).min(axis=1)
-    print(np.where(euk_dist>0, euk_dist, np.inf))
+    min_minvery = np.min(minevery)
+    # print(np.where(euk_dist>0, euk_dist, np.inf))
     #print(euk_dist[np.nonzero(euk_dist)])
-    print('this is min value \n', minevery)
+    # print(minevery.shape)
+    # print(' \n this is all min value every point in filename', filename, '\n',minevery)
+    # print(' \n this is min from all value every point in filename', filename, '\n', min(minevery))
+    # # print(' \n this is min value from all every point in filename', filename, '\n', min_minvery')
+    # print('this is median from minimal value in filename', filename, statistics.median(minevery))
+    # print('this is mean from minimal value in filename', filename, statistics.mean(minevery))
+
+    # for value in (minevery):
+    #     #print(value)
+    #     if value < 300:
+    #         print('in filename',filename, 'we have double detection') 
+     
+    # for idx, item in enumerate(minevery):
+    #     print(item)
+    # importing package
+    # # create data
+    # x = [df_zipped_sort_x[1]]
+    # y = [df_zipped_sort_x[2]]
+
+    # # plot lines
+    # plt.plot(x, y, label = "line 1")
+    # plt.plot(y, x, label = "line 2")
+    # plt.legend()
+    # plt.show()
+    
+    # plt.plot(*zip(*zipped_sort_x))
+    
+    
+    #image = cv.imread('path')
+    #cv.line(image, (x1,y1), (x2,y2), (0,0,255), 3)
+    
     
     
     '''euk in sort of y '''
