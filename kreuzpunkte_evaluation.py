@@ -222,7 +222,13 @@ for filename in ordner:
     yc_0_g = dfc_0.groupby(['group_yc']).mean()
     xc_0_g = dfc_0.groupby(['group_xc']).mean()
     yc_0_g_arr = np.asarray(yc_0_g)
-    xc_o_g_arr = np.asarray(xc_0_g)
+    xc_0_g_arr = np.asarray(xc_0_g)
+    print('yc as array \n', yc_0_g_arr)
+    print('xc as array \n', xc_0_g_arr)
+    #print('yc shape',yc_0_g_arr.shape)
+    print('selected 2 column in yc_0_g_arr',yc_0_g_arr[:,2])
+    print(yc_0_g_arr[:,2].shape)
+    
     #print('here is mean of each group based on yc \n', yc_0_g['yc'])
     # print('here is mean of each group based on xc \n', xc_0_g)
     
@@ -231,14 +237,24 @@ for filename in ordner:
     #         mean_group_yc = statistics.mean(dfc_0['yc'] in dfc_0['group_yc']=0)
     #         print('test mean group nih \n',mean_group_yc) 
             
-    ''' reading an image(still concepting before for loop) '''  
-    image_test = cv2.imread(img_pfad)
-    window_name = 'Image'
-    start_point = 
-    end_point = np.array(4096, yc_0_g[3])
-    color = (0, 255, 0)
-    thickness = 9
-    image = cv2.line(image_test, start_point, end_point, color, thickness)
+    ''' reading an image(still concepting before for loop) ''' 
+    yc_malen = []
+    xc_malen = []
+    for i in yc_0_g_arr[:,2]:
+        yc_malen.append(i)
+    print('yc_malen',yc_malen)
+    # for i in xc_0_g_arr[:,2]:
+    #     xc_malen.append(i)
+    # print('yc_malen',yc_malen)
+         
+    # image_test = cv2.imread(img_pfad)
+    # window_name = 'Image'
+    # start_point = [xc_o_g_arr,yc_0_g_arr]
+    # print('start point', start_point)
+    # end_point = np.array(4096, yc_0_g[3])
+    # color = (0, 255, 0)
+    # thickness = 9
+    #image = cv2.line(image_test, start_point, end_point, color, thickness)
     # cv2.imshow(window_name, image)
     
     
