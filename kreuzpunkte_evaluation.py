@@ -8,13 +8,14 @@ import re
 import itertools
 import math
 from itertools import tee, islice, chain, zip_longest, cycle
+import cv2
 # from evaluation_points import Point  
 from os.path import join 
 from pathlib import Path
 import matplotlib.pyplot as plt
 
 # from pyparsing import delimited_list
-
+img_pfad = 'C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp23/labels/20210809-14-31-16-690857_B74II_matrix_003.jpg'
 pfad = 'C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp23/labels/'
 ordner = os.listdir(pfad)
 
@@ -42,7 +43,7 @@ for filename in ordner:
     #      continue
     #  else:
     #      continue
-    
+    foo = []
     res = []    
     all_min = []
     data = np.loadtxt(pfad + filename, delimiter=' ',dtype=str)
@@ -84,8 +85,8 @@ for filename in ordner:
     headers = ["class", "xc", "yc"]
     df_zipped_sort_c.columns = headers
     print('this is sorting in c \n', df_zipped_sort_c) 
-    foo = df_zipped_sort_c.groupby(pd.cut(df_zipped_sort_c["yc"], np.arange(0, 3000, 500))).sum()
-    print('this is sorting group in yc \n', foo)
+    # foo = df_zipped_sort_c.groupby(pd.cut(df_zipped_sort_c["yc"], np.arange(0, 3000, 500))).sum()
+    # print('this is sorting group in yc \n', foo)
         
     '''This is sort in x for  all classes '''
     # zipped_sort_x = sorted(zipped_list, key=lambda k: [k[1], k[2]])
@@ -123,8 +124,8 @@ for filename in ordner:
     # print(r)
     # r += (df_selected[2].values[...,None] - df_selected[2].values[None]) ** 2
     
-    ''' calculation euk. distance in sort of c with separated classes'''
-    '''calculation euk. distance for class 0'''
+    ''' calculation euk. distance in sort of c with separated classes '''
+    ''' calculation euk. distance for class 0 '''
     rc0 = (dfc_0['xc'].values[...,None] - dfc_0['xc'].values[None]) ** 2
     rc0 += (dfc_0['yc'].values[...,None] - dfc_0['yc'].values[None]) ** 2
     
@@ -136,10 +137,11 @@ for filename in ordner:
     # minval = np.min(euk_dist[np.nonzero(euk_dist)])
     min_val_rc0 = np.where(euk_dist_rc0>0, euk_dist_rc0, np.inf).min(axis=1)
     # print(np.where(euk_dist>0, euk_dist, np.inf))
-    #print(euk_dist[np.nonzero(euk_dist)])
-    print('this is min value of distance every coordinate the their closest neighbour in class 0 \n', min_val_rc0)
-    print('this is the mean of distance every coordinate in class 0 \n', statistics.mean(min_val_rc0))
-    print('this is the median of distance every coordinate in class 0 \n', statistics.median(min_val_rc0)) 
+    # print(euk_dist[np.nonzero(euk_dist)])
+    
+    # print('this is min value of distance every coordinate the their closest neighbour in class 0 \n', min_val_rc0)
+    # print('this is the mean of distance every coordinate in class 0 \n', statistics.mean(min_val_rc0))
+    # print('this is the median of distance every coordinate in class 0 \n', statistics.median(min_val_rc0)) 
     
     '''Decision: we take median for the restriction radius, because mean can a wrong number when double detection in surface happen '''
     
@@ -160,7 +162,7 @@ for filename in ordner:
     # print('this is how many xc in class1', len(dfc_1['xc'].index)) # this work for taking how many xc in class 1 
     
     
-    ''' calculation euk. distance in sort of x'''
+    ''' calculation euk. distance in sort of x '''
     # r = (df_zipped_sort_x[1].values[...,None] - df_zipped_sort_x[1].values[None]) ** 2
     # r += (df_zipped_sort_x[2].values[...,None] - df_zipped_sort_x[2].values[None]) ** 2
     
@@ -190,7 +192,61 @@ for filename in ordner:
     # print('this is append all_min', all_min)
     
     
-    '''value , try with np.meshgrid'''
+    '''value of making radius in 2 Grids for 2 classes , try with np.meshgrid'''
+    ''' for class 0 '''
+    nx_0, ny_0 = ((len(dfc_0['xc'].index)), len(dfc_0['yc'].index)) #ammount of indexes
+    # print('this is nx_0',nx_0, 'this is ny_0', ny_0)
+    x_0 = np.array(dfc_0['xc']) 
+    #x_0 = np.linspace(0, 3000, nx_0)
+    y_0 = np.array(dfc_0['yc'])
+    print('this is x_0', x_0)
+    xv_0, yv_0 = np.meshgrid(x_0, y_0)
+    ''' for class 1 '''
+    nx_1, ny_1 = ((len(dfc_1['xc'].index)), len(dfc_1['yc'].index))
+    # print('this is nx_0',nx_1, 'this is ny_1', ny_0)
+    x_1 = np.array(dfc_1['xc'])
+    y_1 = np.array(dfc_1['yc'])
+    xv_1, yv_1 = np.meshgrid(x_1, y_1)
+    # plt.plot(x_0, y_0, marker='o',markersize = 20, color='c', linestyle='none')
+    # plt.plot(x_1, y_1, marker='o',markersize = 20, color='r', linestyle='none')
+    
+    # plt.show()
+    
+    '''Grouping values'''
+    '''Grouping values for class 0'''
+    # dfc_0['group'] = dfc_0['yc'] // statistics.mean(min_val_rc0)
+    dfc_0['group_yc'] = dfc_0['yc'].floordiv(statistics.mean(min_val_rc0))
+    dfc_0['group_xc'] = dfc_0['xc'].floordiv(statistics.mean(min_val_rc))
+    print('here im trying grouping for class 0 based on y \n',dfc_0) #grouping works!
+    # print('test the shape of dfc', dfc_0['group'].shape)
+    yc_0_g = dfc_0.groupby(['group_yc']).mean()
+    xc_0_g = dfc_0.groupby(['group_xc']).mean()
+    yc_0_g_arr = np.asarray(yc_0_g)
+    xc_o_g_arr = np.asarray(xc_0_g)
+    #print('here is mean of each group based on yc \n', yc_0_g['yc'])
+    # print('here is mean of each group based on xc \n', xc_0_g)
+    
+    # for i in dfc_0['group_yc']:
+    #     if i == 0 :
+    #         mean_group_yc = statistics.mean(dfc_0['yc'] in dfc_0['group_yc']=0)
+    #         print('test mean group nih \n',mean_group_yc) 
+            
+    ''' reading an image(still concepting before for loop) '''  
+    image_test = cv2.imread(img_pfad)
+    window_name = 'Image'
+    start_point = 
+    end_point = np.array(4096, yc_0_g[3])
+    color = (0, 255, 0)
+    thickness = 9
+    image = cv2.line(image_test, start_point, end_point, color, thickness)
+    # cv2.imshow(window_name, image)
+    
+    
+    ''' Grouping values for class 1'''
+    # dfc_1['group_yc'] = dfc_1['yc'].floordiv(statistics.mean(min_val_rc1))
+    # print('here im trying grouping for class 1 based on y  \n',dfc_0) #grouping works!
+    
+
     
     
     # min_dist = np.min(euk_dist) 
@@ -208,3 +264,13 @@ for filename in ordner:
     
     # table=re.sub("(\r|\n)[\t]+|(\r|\n)[' ']+","\n",table)
     # table2=re.sub("\b[\t]+|[' ']+"," ",table) # free row dsd 
+
+
+'''this is my important quelle to transform from data Frame to array'''
+# foo.append(yc_0_g)
+# foo_array = np.asarray(foo)
+# # print('this is foo shape \n',foo.shape )
+# print(foo_array)
+# test_shape = foo_array[:,:,2]
+# print('testing foo array',foo_array[:,:,2])
+# print('this is shape of arrayafter sorting',test_shape.shape)
