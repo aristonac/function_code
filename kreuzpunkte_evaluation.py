@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 # from pyparsing import delimited_list
 
-pfad = 'C:/Users/arist/Documents/HS_KL_SEMII/Projectwork/arbeitsplatz/yolov5/runs/detect/detect_testing/labels/'
+pfad = 'C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp23/labels/'
 ordner = os.listdir(pfad)
 
 def selection_sort(x):
@@ -46,7 +46,7 @@ for filename in ordner:
     res = []    
     all_min = []
     data = np.loadtxt(pfad + filename, delimiter=' ',dtype=str)
-    # print('this is the filename', filename)
+    print('this is the filename', filename)
     df  = pd.DataFrame(data)
     df.head()
     df.columns = ['class','x_center','y_center','width','height']
@@ -146,7 +146,7 @@ for filename in ordner:
     '''calculation euk. distance for class 1'''
     rc1 = (dfc_1['xc'].values[...,None] - dfc_1['xc'].values[None]) ** 2
     rc1 += (dfc_1['yc'].values[...,None] -dfc_1['yc'].values[None]) ** 2
-    
+    # print(dfc_1['xc'])
     euk_dist_rc1 = np.sqrt(rc1) # only between values next and before
     # dist[np.diag_indices(dist.shape[0])] = 1e10
     # print('this is euk dist \n' , euk_dist)
@@ -157,6 +157,7 @@ for filename in ordner:
     # print(np.where(euk_dist>0, euk_dist, np.inf))
     #print(euk_dist[np.nonzero(euk_dist)])
     print('this is min value of distance every coordinate the their closest neighbour in class 1 \n', min_val_rc1)
+    # print('this is how many xc in class1', len(dfc_1['xc'].index)) # this work for taking how many xc in class 1 
     
     
     ''' calculation euk. distance in sort of x'''
@@ -185,11 +186,12 @@ for filename in ordner:
     # dist[np.diag_indices(dist.shape[0])] = 1e10
     print('this is euk distance of every point for all classes \n',min_val_rc) #last time working on these before pause 10.01.2023
     print('this is min of min from a euk \n', min_of_min)
-    all_min.append(min_of_min)
-    print('this is append all_min', all_min)
+    # all_min.append(min_of_min)
+    # print('this is append all_min', all_min)
     
     
-    '''value '''
+    '''value , try with np.meshgrid'''
+    
     
     # min_dist = np.min(euk_dist) 
     # med_dist = np.median(euk_dist)
