@@ -3,50 +3,60 @@ import numpy as np
 import pandas as pd
 import statistics
 import os
-import statistics
+from skimage.io import imread_collection
+import glob
 import re
 import itertools
-import math
+import imageio
 from itertools import tee, islice, chain, zip_longest, cycle
 import cv2
 # from evaluation_points import Point  
 from os.path import join 
 from pathlib import Path
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 # from pyparsing import delimited_list
-img_pfad = 'C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp23/labels/20210809-14-31-16-690857_B74II_matrix_003.jpg'
-pfad = 'C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp23/labels/'
-ordner = os.listdir(pfad)
+pfad = 'C:/Users/arist/Documents/HS_KL_SEMII/Projectwork/arbeitsplatz/yolov5/runs/detect/detect_testing/labels/'
+ordner = glob.glob(os.path.join(pfad, "*txt"))
+#pfad = 'C:/Users/arist/Documents/HS_KL_SEMII/Projectwork/arbeitsplatz/yolov5/runs/detect/detect_testing/labels/'
+#ordner = os.listdir(pfad)
 
-def selection_sort(x):
-    for i in range(len(x)):
-        swap = i + np.argmin(x[i:])
-        (x[i], x[swap]) = (x[swap], x[i])
-    return x
+def load_images_from_folder(img_pfad):
+    images = []
+    for filename in os.listdir(img_pfad):
+    # images = []
+        img = cv2.imread(os.path.join(img_pfad,filename))
+        if img is not None:
+            images.append(img)
+    return images
 
-def previous_and_next(some_iterable):
-    prevs, items, nexts = tee(some_iterable, 3)
-    prevs = chain([None], prevs)
-    nexts = chain(islice(nexts, 1, None), [None])
-    return zip_longest(prevs, items, nexts)
+# for img_filename in img_ordner:
+#     img_filename_malen = []
+#     print('img_filename \n', img_filename)
+#     img_filename_malen.append(img_filename)
+#     img_data = imageio.imread(os.path.join(img_pfad , img_filename_malen))
 
-   
-    
-    
-    
+# for img_filename in img_ordner:
+        
+#     img_filename_malen = []
+#         # print('img_filename \n', img_filename)
+#         # img_filename_malen.append(img_filename)
+#     img_data = imageio.imread(os.path.join(img_pfad , img_filename))    
+#for img_filename in img_ordner:
+        
+        # img_filename_malen = []
+        # print('img_filename \n', img_filename)
+        # img_filename_malen.append(img_filename)
+    # img_data = imageio.imread(os.path.join(img_pfad , img_filename))   
+     
 for filename in ordner: 
-    # for file in os.listdir(pfad):
-    #  filename = os.fsdecode(file)
-    #  if filename.endswith(".txt") or filename.endswith(".py"): 
-    #      print(os.path.join(pfad, filename))
-    #      continue
-    #  else:
-    #      continue
+
     foo = []
     res = []    
     all_min = []
-    data = np.loadtxt(pfad + filename, delimiter=' ',dtype=str)
+    
+    data = np.loadtxt(filename, delimiter=' ',dtype=str)
     print('this is the filename', filename)
     df  = pd.DataFrame(data)
     df.head()
@@ -210,6 +220,8 @@ for filename in ordner:
     # plt.plot(x_0, y_0, marker='o',markersize = 20, color='c', linestyle='none')
     # plt.plot(x_1, y_1, marker='o',markersize = 20, color='r', linestyle='none')
     
+    '''try with appended index'''
+    
     # plt.show()
     
     '''Grouping values'''
@@ -219,15 +231,33 @@ for filename in ordner:
     dfc_0['group_xc'] = dfc_0['xc'].floordiv(statistics.mean(min_val_rc))
     print('here im trying grouping for class 0 based on y \n',dfc_0) #grouping works!
     # print('test the shape of dfc', dfc_0['group'].shape)
-    yc_0_g = dfc_0.groupby(['group_yc']).mean()
-    xc_0_g = dfc_0.groupby(['group_xc']).mean()
+    yc_0_g = dfc_0.groupby(['group_yc']).median()
+    xc_0_g = dfc_0.groupby(['group_xc']).median()
+    
     yc_0_g_arr = np.asarray(yc_0_g)
     xc_0_g_arr = np.asarray(xc_0_g)
-    print('yc as array \n', yc_0_g_arr)
-    print('xc as array \n', xc_0_g_arr)
+    print('yc0 as array \n', yc_0_g_arr)
+    print('xc0 as array \n', xc_0_g_arr)
     #print('yc shape',yc_0_g_arr.shape)
-    print('selected 2 column in yc_0_g_arr',yc_0_g_arr[:,2])
-    print(yc_0_g_arr[:,2].shape)
+    # print('selected 2. column in yc_0_g_arr',yc_0_g_arr[:,2])
+    # print(yc_0_g_arr[:,2].shape)
+    # print('selected 1. column in xc_0_g_arr',xc_0_g_arr[:,1])
+    
+    '''Grouping values for class 1'''
+    dfc_1['group_yc'] = dfc_1['yc'].floordiv(statistics.mean(min_val_rc1))
+    dfc_1['group_xc'] = dfc_1['xc'].floordiv(statistics.mean(min_val_rc))
+    # print('here im trying grouping for class 0 based on y \n',dfc_0) #grouping works!
+    # print('test the shape of dfc', dfc_0['group'].shape)
+    yc_1_g = dfc_1.groupby(['group_yc']).median()
+    xc_1_g = dfc_1.groupby(['group_xc']).median()
+    
+    yc_1_g_arr = np.asarray(yc_1_g)
+    xc_1_g_arr = np.asarray(xc_1_g)
+    # print('yc as array \n', yc_1_g_arr)
+    # print('xc as array \n', xc_1_g_arr)
+    # #print('yc shape',yc_0_g_arr.shape)
+    # print('selected 2. column in yc_0_g_arr',yc_1_g_arr[:,2])
+    # print(yc_1_g_arr[:,2].shape)
     
     #print('here is mean of each group based on yc \n', yc_0_g['yc'])
     # print('here is mean of each group based on xc \n', xc_0_g)
@@ -238,11 +268,90 @@ for filename in ordner:
     #         print('test mean group nih \n',mean_group_yc) 
             
     ''' reading an image(still concepting before for loop) ''' 
-    yc_malen = []
-    xc_malen = []
+    yc_0_malen = []
+    xc_0_malen = []
+    yc_1_malen = []
+    xc_1_malen = []
+    
     for i in yc_0_g_arr[:,2]:
-        yc_malen.append(i)
-    print('yc_malen',yc_malen)
+        yc_0_malen.append(i)
+    print('yc_0_malen',yc_0_malen)
+    
+    for i in xc_0_g_arr[:,1]:
+        xc_0_malen.append(i)
+    print('xc_0_malen',xc_0_malen)
+    
+    for i in yc_1_g_arr[:,2]:
+        yc_1_malen.append(i)
+    print('yc_1_malen',yc_1_malen)
+    
+    for i in xc_1_g_arr[:,1]:
+        xc_1_malen.append(i)
+    print('xc_1_malen',xc_1_malen)
+    
+    img_filename_malen = []
+
+    '''Plotting on image '''
+    #for img_filename in img_ordner:
+    
+        # img_filename_malen = []
+        # print('img_filename \n', img_filename)
+        # img_filename_malen.append(img_filename)
+    img_data = imageio.imread(filename.replace(".txt", ".jpg"))
+    # print(img_data)
+    plt.hlines(yc_0_malen, 0, 4096)
+    plt.hlines(yc_1_malen, 0, 4096, colors='red')
+    plt.vlines(xc_0_malen, 0, 3000)
+    plt.vlines(xc_1_malen, 0, 3000, colors='red')
+    plt.imshow(img_data)
+    plt.show()
+        
+    # # print(image)
+    # # print(img_filename_malen)
+    # img_data = imageio(os.path.join(img_pfad,img_filename_malen))
+    # plt.hlines(yc_0_malen, 0, 4096)
+    # plt.hlines(yc_1_malen, 0, 4096, colors='red')
+    # plt.vlines(xc_0_malen, 0, 3000)
+    # plt.vlines(xc_1_malen, 0, 3000, colors='red')
+    # plt.imshow(img_data)
+    # plt.show()
+          
+    # img = mpimg.imread('C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp23/*.jpg')
+    # # print(img)
+
+    # plt.imshow(img)
+    # plt.show()    
+    # #your path 
+    # col_dir = 'C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp23//*.jpg'
+
+    # #creating a collection with the available images
+    # col = imread_collection(col_dir)
+    
+    # images = []
+    # for img_path in glob.glob('C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp23/*.jpg'):
+    #     images.append(mpimg.imread(img_path))
+    
+    # plt.figure(figsize=(20,10))
+    # columns = 5
+    # for i, image in enumerate(images):
+    #     plt.subplot(len(images) / columns + 1, columns, i + 1)
+    #     plt.imshow(image)
+    #     plt.xticks([])
+    #     plt.yticks([])
+        
+        
+    # print('this is col', col)
+
+    # plt.imshow(col)
+    # plt.show()
+    
+    # plt.ylim(1, 9)
+
+ 
+    
+    
+    # plt.axhline(y = 0.5, color = 'r', linestyle = '-')
+    # plt.show
     # for i in xc_0_g_arr[:,2]:
     #     xc_malen.append(i)
     # print('yc_malen',yc_malen)
@@ -282,7 +391,8 @@ for filename in ordner:
     # table2=re.sub("\b[\t]+|[' ']+"," ",table) # free row dsd 
 
 
-'''this is my important quelle to transform from data Frame to array'''
+    '''this is my important quelle to transform from data Frame to array'''
+
 # foo.append(yc_0_g)
 # foo_array = np.asarray(foo)
 # # print('this is foo shape \n',foo.shape )
