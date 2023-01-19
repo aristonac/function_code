@@ -273,6 +273,7 @@ for filename in ordner:
     yc_1_malen = []
     xc_1_malen = []
     
+  
     for i in yc_0_g_arr[:,2]:
         yc_0_malen.append(i)
     print('yc_0_malen',yc_0_malen)
@@ -341,7 +342,6 @@ for filename in ordner:
         
         
     # print('this is col', col)
-
     # plt.imshow(col)
     # plt.show()
     
