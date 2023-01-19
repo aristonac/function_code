@@ -17,10 +17,10 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 # from pyparsing import delimited_list
-img_pfad = 'C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp23/'
-img_ordner = os.listdir(img_pfad)
-pfad = 'C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp23/labels/'
-ordner = os.listdir(pfad)
+pfad = 'C:/Users/arist/Documents/HS_KL_SEMII/Projectwork/arbeitsplatz/yolov5/runs/detect/detect_testing/labels/'
+ordner = glob.glob(os.path.join(pfad, "*txt"))
+#pfad = 'C:/Users/arist/Documents/HS_KL_SEMII/Projectwork/arbeitsplatz/yolov5/runs/detect/detect_testing/labels/'
+#ordner = os.listdir(pfad)
 
 def load_images_from_folder(img_pfad):
     images = []
@@ -30,15 +30,33 @@ def load_images_from_folder(img_pfad):
         if img is not None:
             images.append(img)
     return images
-    
-    
+
+# for img_filename in img_ordner:
+#     img_filename_malen = []
+#     print('img_filename \n', img_filename)
+#     img_filename_malen.append(img_filename)
+#     img_data = imageio.imread(os.path.join(img_pfad , img_filename_malen))
+
+# for img_filename in img_ordner:
+        
+#     img_filename_malen = []
+#         # print('img_filename \n', img_filename)
+#         # img_filename_malen.append(img_filename)
+#     img_data = imageio.imread(os.path.join(img_pfad , img_filename))    
+#for img_filename in img_ordner:
+        
+        # img_filename_malen = []
+        # print('img_filename \n', img_filename)
+        # img_filename_malen.append(img_filename)
+    # img_data = imageio.imread(os.path.join(img_pfad , img_filename))   
+     
 for filename in ordner: 
 
     foo = []
     res = []    
     all_min = []
     
-    data = np.loadtxt(pfad + filename, delimiter=' ',dtype=str)
+    data = np.loadtxt(filename, delimiter=' ',dtype=str)
     print('this is the filename', filename)
     df  = pd.DataFrame(data)
     df.head()
@@ -213,13 +231,13 @@ for filename in ordner:
     dfc_0['group_xc'] = dfc_0['xc'].floordiv(statistics.mean(min_val_rc))
     print('here im trying grouping for class 0 based on y \n',dfc_0) #grouping works!
     # print('test the shape of dfc', dfc_0['group'].shape)
-    yc_0_g = dfc_0.groupby(['group_yc']).mean()
-    xc_0_g = dfc_0.groupby(['group_xc']).mean()
+    yc_0_g = dfc_0.groupby(['group_yc']).median()
+    xc_0_g = dfc_0.groupby(['group_xc']).median()
     
     yc_0_g_arr = np.asarray(yc_0_g)
     xc_0_g_arr = np.asarray(xc_0_g)
-    # print('yc as array \n', yc_0_g_arr)
-    # print('xc as array \n', xc_0_g_arr)
+    print('yc0 as array \n', yc_0_g_arr)
+    print('xc0 as array \n', xc_0_g_arr)
     #print('yc shape',yc_0_g_arr.shape)
     # print('selected 2. column in yc_0_g_arr',yc_0_g_arr[:,2])
     # print(yc_0_g_arr[:,2].shape)
@@ -230,8 +248,8 @@ for filename in ordner:
     dfc_1['group_xc'] = dfc_1['xc'].floordiv(statistics.mean(min_val_rc))
     # print('here im trying grouping for class 0 based on y \n',dfc_0) #grouping works!
     # print('test the shape of dfc', dfc_0['group'].shape)
-    yc_1_g = dfc_1.groupby(['group_yc']).mean()
-    xc_1_g = dfc_1.groupby(['group_xc']).mean()
+    yc_1_g = dfc_1.groupby(['group_yc']).median()
+    xc_1_g = dfc_1.groupby(['group_xc']).median()
     
     yc_1_g_arr = np.asarray(yc_1_g)
     xc_1_g_arr = np.asarray(xc_1_g)
@@ -255,27 +273,49 @@ for filename in ordner:
     yc_1_malen = []
     xc_1_malen = []
     
+  
     for i in yc_0_g_arr[:,2]:
         yc_0_malen.append(i)
-    print('yc_malen',yc_0_malen)
+    print('yc_0_malen',yc_0_malen)
     
     for i in xc_0_g_arr[:,1]:
         xc_0_malen.append(i)
-    print('xc_malen',xc_0_malen)
+    print('xc_0_malen',xc_0_malen)
     
     for i in yc_1_g_arr[:,2]:
         yc_1_malen.append(i)
+    print('yc_1_malen',yc_1_malen)
     
     for i in xc_1_g_arr[:,1]:
         xc_1_malen.append(i)
+    print('xc_1_malen',xc_1_malen)
     
-    
+    img_filename_malen = []
 
     '''Plotting on image '''
-    for img_filename in img_ordner:
-        img_data = imageio.imread(img_pfad + img_filename, dtype=str)
-        plt.imshow(img_data)
-        plt.show()
+    #for img_filename in img_ordner:
+    
+        # img_filename_malen = []
+        # print('img_filename \n', img_filename)
+        # img_filename_malen.append(img_filename)
+    img_data = imageio.imread(filename.replace(".txt", ".jpg"))
+    # print(img_data)
+    plt.hlines(yc_0_malen, 0, 4096)
+    plt.hlines(yc_1_malen, 0, 4096, colors='red')
+    plt.vlines(xc_0_malen, 0, 3000)
+    plt.vlines(xc_1_malen, 0, 3000, colors='red')
+    plt.imshow(img_data)
+    plt.show()
+        
+    # # print(image)
+    # # print(img_filename_malen)
+    # img_data = imageio(os.path.join(img_pfad,img_filename_malen))
+    # plt.hlines(yc_0_malen, 0, 4096)
+    # plt.hlines(yc_1_malen, 0, 4096, colors='red')
+    # plt.vlines(xc_0_malen, 0, 3000)
+    # plt.vlines(xc_1_malen, 0, 3000, colors='red')
+    # plt.imshow(img_data)
+    # plt.show()
           
     # img = mpimg.imread('C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp23/*.jpg')
     # # print(img)
@@ -302,8 +342,6 @@ for filename in ordner:
         
         
     # print('this is col', col)
-    # plt.hlines(yc_0_malen, 0, 4096)
-    # plt.vlines(xc_0_malen, 0, 3000)
     # plt.imshow(col)
     # plt.show()
     
