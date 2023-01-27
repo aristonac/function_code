@@ -11,6 +11,9 @@ import matplotlib.pyplot as plt
 pfad = 'C:/Users/ML/venv_yolov5/yolov5/runs/detect_cp/cp23/labels/'
 ordner = glob.glob(os.path.join(pfad, "*txt"))
 
+def pos(lst):
+    return [x for x in lst if x > 0] or None
+
 def load_images_from_folder(img_pfad):
     images = []
     for filename in os.listdir(img_pfad):
@@ -85,9 +88,9 @@ for filename in ordner:
     # df_selected = pd.DataFrame(zipped_list)
     
     '''Slicing the data based on class'''
-    dfc_0 = df_zipped_sort_c[df_zipped_sort_c['class'] == 0]
+    dfc_0 = df_zipped_sort_c[df_zipped_sort_c['class'] in [0,2]]
     dfc_1 = df_zipped_sort_c[df_zipped_sort_c['class'] == 1]
-    dfc_2 = df_zipped_sort_c[df_zipped_sort_c['class'] == 2]
+    # dfc_2 = df_zipped_sort_c[df_zipped_sort_c['class'] == 2] #
     # print("this is xc in dfc_0 \n", dfc_0['xc'])
     
     # print(df_selected)
@@ -106,7 +109,7 @@ for filename in ordner:
     # r += (df_selected[2].values[...,None] - df_selected[2].values[None]) ** 2
     
     ''' calculation euk. distance in sort of c with separated classes, it means we find horizontal lines ''' 
-    ''' calculation euk. distance for class 0 '''
+    ''' calculation euk. distance for class 0  '''
     rc0 = (dfc_0['xc'].values[...,None] - dfc_0['xc'].values[None]) ** 2
     rc0 += (dfc_0['yc'].values[...,None] - dfc_0['yc'].values[None]) ** 2
     
@@ -203,7 +206,10 @@ for filename in ordner:
     # dfc_0['group_xc'] = dfc_0['xc'].floordiv(statistics.median(min_val_rc0 ))
     
     dfc_0['group_yc'] = dfc_0['yc'].floordiv(ver_rc0)
-    dfc_0['group_xc'] = dfc_0['xc'].floordiv(min(dfc_0['xc']))
+    dfc_0['group_xc'] = dfc_0['xc'].floordiv(max_of_min_rc)
+    
+    # dfc_0['group_yc'] = dfc_0['yc'].floordiv(ver_rc0)
+    # dfc_0['group_xc'] = dfc_0['xc'].floordiv(min(dfc_0['xc']))
     
     # dfc_0['group_yc'] = dfc_0['yc'].floordiv(min(dfc_0['yc']))
     # dfc_0['group_xc'] = dfc_0['xc'].floordiv(min(dfc_0['xc']))
@@ -225,10 +231,19 @@ for filename in ordner:
     
     # print('based on yc 2n grouping \n', yc_0_g_2)
     
-
+    '''make closed mean together'''
+    
+    # yc_0_g_merge = yc_0_g['yc'].values[...,None] - yc_0_g['yc'].values[None]
+    # pos_yc_0_g_merge = pos(yc_0_g_merge)
+    # print('this is only pos value from yc_0_g_merge \n', pos_yc_0_g_merge)
+    
+    # print("here is yc_0_g \n", yc_0_g_merge)
+    
+    # yc_0_g['yc'] = yc_0_g['yc'].where(yc_0_g['yc'].values[...,None] - yc_0_g['yc'].values[None] < 150, 0)
     
     yc_0_g_arr = np.asarray(yc_0_g)
     xc_0_g_arr = np.asarray(xc_0_g)
+    
     print('yc0 as array \n', yc_0_g_arr)
     print('xc0 as array \n', xc_0_g_arr)
     #print('yc shape',yc_0_g_arr.shape)
@@ -241,7 +256,10 @@ for filename in ordner:
     # dfc_1['group_xc'] = dfc_1['xc'].floordiv(statistics.median(min_val_rc1))
     
     dfc_1['group_yc'] = dfc_1['yc'].floordiv(ver_rc1)
-    dfc_1['group_xc'] = dfc_1['xc'].floordiv(min(dfc_1['xc']))
+    dfc_1['group_xc'] = dfc_1['xc'].floordiv(max_of_min_rc)
+    
+    # dfc_1['group_yc'] = dfc_1['yc'].floordiv(ver_rc1)
+    # dfc_1['group_xc'] = dfc_1['xc'].floordiv(min(dfc_1['xc']))
     
     # dfc_1['group_yc'] = dfc_1['yc'].floordiv(min(dfc_1['yc']))
     # dfc_1['group_xc'] = dfc_1['xc'].floordiv(min(dfc_1['xc']))
